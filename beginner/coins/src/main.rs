@@ -10,21 +10,23 @@ fn main() {
         stack[i] = chr.parse::<i32>().unwrap();
     }
     let mut count = 0;
-    let mut _remains = 0;
-    for i in 0..(stack[0] + 1) {
-        _remains = stack[3] - i * 500;
-        if _remains < 0 {break;}
-        // println!("i=======================: {}, remains: {}", i, _remains);
+    let mut sum_500 = 0;
+    for _i in 0..(stack[0] + 1) {
+        if sum_500 > stack[3] {break;}
+        if sum_500 == stack[3] {count+=1;break;}
+        let mut sum_100 = sum_500;
         for _j in 0..(stack[1] + 1) {
-            if _remains < 0 {break;}
-            _remains -=  100;
-            // println!("j: {}, remains: {}", j, _remains);
-            if _remains < stack[2] * 50 {
-                count += 1;
-                // println!("countup");
-                continue;
+            if sum_100 > stack[3] {break;}
+            if sum_100 == stack[3] {count+=1;break;}
+            let mut sum_50 = sum_100;
+            for k in 0..(stack[2] + 1) {
+                if sum_50 > stack[3] {break;}
+                if sum_50 == stack[3] {count+=1;break;}
+                sum_50 += 50
             }
+            sum_100 += 100;
         }
+        sum_500 += 500;
     }
-    println!("{}", count);
+    println!("{}", count)
 }
