@@ -8,8 +8,8 @@ fn main() {
         stack[i] = j.parse::<i32>().unwrap();
     }
     let mut sum = 0;
-    if stack[0] == 10000 && stack[1] < 2 {
-        sum +=10000;
+    if stack[0] == 10000 {
+        if stack[1] < 2 {sum +=10000;};
         stack[0] -= 1;
     }
     // println!("stack0:{}", stack[0]);
@@ -19,6 +19,11 @@ fn main() {
         let mut temp = 0;
         let mut minus = 0;
         let mut calculated = 0;
+        calculated = i / 10000;
+        if calculated > 0 {
+            temp += calculated;
+            minus += 10000 * calculated;
+        }
         calculated = i / 1000;
         if calculated > 0 {
             temp += calculated;
