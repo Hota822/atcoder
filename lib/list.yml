@@ -1,0 +1,5 @@
+io:
+  input:
+    standard:       一行の入力の取得、ホワイトスペースで分割
+  math:
+    euclidean:     最小公倍数、公約数の取得
