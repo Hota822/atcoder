@@ -2,8 +2,8 @@
   const { Tracer, Array1DTracer, Array2DTracer, LogTracer, Layout, VerticalLayout } = require('algorithm-visualizer');
   // }
   
-  const values = [1, 4, 5, 7]; // The value of all available items
-  const weight = [1, 3, 4, 5]; // The weights of available items
+  const values = [1, 4, 5, 7]; // 価値一覧
+  const weight = [1, 3, 4, 5]; // 重さ一覧
   const max_weight = 7; // ナップサックの容量
   const values_len = values.length;
   const DP = new Array(values_len + 1);
@@ -40,6 +40,8 @@
         tracer.depatch(row , column);
         // }
       } else if (weight[row - 1] <= column) { // take the current item in our collection
+        // 列の値の方がn番目の重さより大きい　＝　入れられる可能性があるとき
+        // 列の値のほうが小さいとき　＞＞elseの処理
         // visualize {
         weightsTracer.select(row - 1);
         valuesTracer.select(row - 1);
@@ -48,15 +50,21 @@
         tracer.select(row - 1, column);
         Tracer.delay();
         // }
-        logger.println(`weight[row-1]: ${weight[row -1]}`);
-        logger.println(`column :  ${column}`);
+        
+        // logger.println(`weight[row-1]: ${weight[row -1]}`);
+        // logger.println(`column :  ${column}`);
         const A = values[row - 1] + DP[row - 1][column - weight[row - 1]];
+        // 今回入れようとしているアイテムの価値( values[row -1])
+        // + 今回のアイテムをちょうど入れることができる時の価値の最大値
+        // 今回のアイテムを使ってちょうど重さをcolumnにした時の価値の最大値
         const B = DP[row - 1][column];
+        // ひとつ前までのアイテムを使った時の価値の最大値
         /*
         find the maximum of these two values
         and take which gives us a greater weight
          */
         if (A > B) {
+          // A、Bのどちらか大きいほうを入れる
           DP[row ][column] = A;
           // visualize {
           tracer.patch(row , column, DP[row ][column]);
@@ -79,6 +87,7 @@
         // }
       } else { // leave the current item from our collection
         DP[row ][column] = DP[row - 1][column];
+        // 新しい要素を入れることができないので、値は一行上と同じ
         // visualize {
         tracer.patch(row , column, DP[row ][column]);
         Tracer.delay();
