@@ -26,31 +26,49 @@ fn main() {
         damages.push(input.pop().unwrap());
     }
 
-    let mut minimun_cost = 100000000;
-    let mut remained_life = 0;
-    let mut total_attack = 0;
-    let mut cost_for_i = 0;
-    for i  in 0..stack[1] {
-        total_attack = stack[0] % damages[i as usize];
-        cost_for_i = stack[0] / damages[i as usize] * costs[i as usize];
-        println!("damage of {} =================================",damages[i as usize] );
-        for j in 0..stack[1] {
-            println!("times: {}, danage: {}",j , damages[j as usize]);
-            remained_life = total_attack;
-            println!("before remain:{}",remained_life );
-            let mut cost = cost_for_i;
-            println!("before cost{}, stack: {}, damages:{}, costs:{}",cost, stack[0], damages[j as usize], costs[j as usize] );
-            while remained_life > 0 {
-                remained_life -= damages[j as usize];
-                cost += costs[j as usize];
+    let hp = stack[0]; // columns
+    let types = stack[1]; // rows
+    let mut dp_table:Vec<i32> = vec![100000000; (hp + 1) as usize];
+    dp_table[0] = 0;
+
+    // println!("hp: {}, types:{}, len:{}",hp, types, dp_table.len() );
+    for t in 1..(types + 1) {
+        let t: usize = t as usize;
+        for h in 1..(hp + 1) {
+            // println!("in for " );
+            // println!("  t:{}, h:{}",t, h );
+            // println!("  costs[t -1]:{}",costs[t -1 as usize]);
+            // println!("  dp_table[h]:{}",dp_table[h as usize] );
+            // for i in &dp_table {
+            //     // print!("{}, ",i );
+            // }
+            
+
+            if h <= damages[t - 1] {
+                let h: usize = h as usize;
+                //1回で大丈夫なとき
+                if costs[t -1] < dp_table[h] {
+                    dp_table[h] = costs[t -1];
+                }
+                // println!("  if");
+                // println!("    dp_table: {}", dp_table[h as usize]);
+                // println!("    damages:{}",damages[t - 1]  );
+                // println!("    cost: {}", costs[t - 1] );
+            } else {
+                // tableの現在の最小値と、攻撃可能な時の最小値を比較
+                let h: usize = h as usize;
+                // println!("  ok");
+                // println!("    damages:{}",damages[t - 1]  );
+                // println!("    dp_before: {}", dp_table[h - damages[t - 1] as usize]);
+                // println!("    cost: {}", costs[t - 1] );
+                if dp_table[h] > ( dp_table[h - damages[t - 1] as usize] + costs[t - 1] ) {
+                    // println!("ok");
+                    dp_table[h] = dp_table[h - damages[t - 1] as usize] + costs[t - 1];
+                }
             }
-            println!("remained_life:{}", remained_life );
-            println!("costs{}",cost );
-            println!("====================");
-            if minimun_cost > cost { minimun_cost = cost}
         }
     }
-    println!("{}",minimun_cost );
+    println!("{}",dp_table.pop().unwrap());
 }
 
 // fn vector_sort(vec: &mut Vec<[i32; 2]>, index: &i32, value: &i32) {
