@@ -67,6 +67,7 @@ fn main() {
                 }
             }
         }
+        if t == 2 {break;}
     }
     println!("{}",dp_table.pop().unwrap());
 }
