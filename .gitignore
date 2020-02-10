@@ -6,3 +6,4 @@ lib/lib_test
 lib/lib_test/*
 lib/lib_test/src
 lib/lib_test/src/main.rs
+test_data
