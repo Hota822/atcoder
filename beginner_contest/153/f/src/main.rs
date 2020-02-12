@@ -1,99 +1,50 @@
-
-fn main() {
-    let vec: Vec<i32> = get_input_by_vec();
-    // 0: N 体のモンスター
-    // 1: D 爆弾の範囲
-    // 2: A 爆弾のダメージ
-    let (mut each_hp_and_location, mut locations) = get_input_by_loop(vec[0]);
-
-    locations.sort();
-    let mut used_bomb: i64 = 0;
-    let bomb_range = vec[1] * 2;
-    let mut effect_range_head = 0;
-    let damage = vec[2];
-    let mut counter = 0;
-    let mut _using_bomb_position = 0; // 暫定値
-
-    // println!("location.len:{}",locations.len() );
-    while  locations.len() > 0 {
-        counter += 1;
-        // println!("count {}",counter );
-
-        // モンスターの位置を取得
-        let next_monster_location = locations.pop().unwrap();
-
-        // 累積（巻き添え）ダメージを初期化
-        let mut accumulation_damage = 0;
-
-        // 対象モンスターのHPを取得
-        {
-            let mut hp: &i32 = &0;
-            for i in 0..each_hp_and_location.len() {
-                if each_hp_and_location[i][0] != next_monster_location {continue;}
-                hp = &each_hp_and_location[i][1];
+pub fn main() {
+    use std::collections::BinaryHeap;
+    use std::collections::VecDeque;
+    let mut s = String::new();
+    std::io::stdin().read_line(&mut s).unwrap();
+    let nda = s
+        .split_whitespace()
+        .map(|w| w.parse().unwrap())
+        .collect::<Vec<i64>>();
+    let n = nda[0];
+    let d = nda[1];
+    let a = nda[2];
+    let mut heap = BinaryHeap::with_capacity(n as usize);
+    for _ in 0..n {
+        s.clear();
+        std::io::stdin().read_line(&mut s).unwrap();
+        let xh = s
+            .split_whitespace()
+            .map(|w| w.parse().unwrap())
+            .collect::<Vec<i64>>();
+        heap.push((xh[0], xh[1]));
+    }
+    let mut count = 0;
+    let mut damage = 0;
+    let mut queue: VecDeque<(i64, i64)> = VecDeque::new();
+    while !heap.is_empty() {
+        // 使用済みの爆弾の影響がないとき || モンスターの位置が前に使った爆弾の範囲に入っていた時
+        if queue.is_empty() || heap.peek().unwrap().0 >= queue.front().unwrap().0 {
+            // ヒープからモンスターを取得
+            let (x, h) = heap.pop().unwrap();
+            // モンスターが生きている場合
+            if h > damage {
+                // 爆弾の使用回数
+                let q = (h - damage + a - 1) / a;
+                // 累計の爆弾の使用回数
+                count += q;
+                // 累積ダメージを計算
+                damage += q * a;
+                // 今回使用した爆弾の影響範囲とダメージをキューに保存
+                queue.push_back((x - 2 * d, q * a));
             }
-
-            // HP<=0(前のBombで死んだとき）の時はcontinue
-            if hp <= &0 {continue;}
-
-            // BOMBダメージ計算（対象のモンスター）
-            // BOM位置が範囲を外れた時はBOMの範囲で使用
-            if next_monster_location - (bomb_range / 2) < 0 {_using_bomb_position = 0}
-
-            // 爆発の影響範囲計算
-            effect_range_head = next_monster_location - bomb_range;
-
-            //累積カウントの計算（Temp）
-            accumulation_damage = (hp + damage - 1) / damage;
-        }
-
-        // 使用回数を計算
-        used_bomb += accumulation_damage as i64;
-
-        // 累積ダメージの計算
-        accumulation_damage *= damage;
-
-        // BOMBダメージ計算（対象のモンスター）
-        for i in 0..each_hp_and_location.len() {
-            // 範囲にいた時の処理
-            if  effect_range_head <= each_hp_and_location[i][0] {
-                each_hp_and_location[i][1] -=  accumulation_damage;
-            }
+        } else {
+            // モンスターの位置が爆弾の範囲外の時
+            let (_, h) = queue.pop_front().unwrap();
+            // 累積ダメージを減らす
+            damage -= h;
         }
     }
-    println!("{}",used_bomb);
-}
-
-
-fn get_input_by_vec() -> Vec<i32> {
-    let mut input  = String::new();
-    std::io::stdin().read_line(&mut input).unwrap();
-    let mut _vec: Vec<i32> = input.split_whitespace()
-                            .map(|x| x.parse().unwrap())
-                            .collect();
-    _vec
-}
-
-fn get_input_by_loop(loop_count: i32) -> (Vec<Vec<i32>>, Vec<i32>) {
-    let mut input = String::new();
-    let mut vec: Vec<Vec<i32>> = Vec::new();
-    let mut locations: Vec<i32> = Vec::new();
-    for _i in 0..loop_count {
-        std::io::stdin().read_line(&mut input).unwrap();
-    }
-    let mut temp: Vec<i32> = input.split_whitespace()
-         .map(|x| x.parse::<i32>().unwrap())
-         .collect();
-
-    let (mut x, mut y) = (0, 0);
-    loop{
-        x = match temp.pop() {
-            Some(v)  => v,
-            None => break
-        };
-        y = temp.pop().unwrap();
-        vec.push(vec![y, x]);
-        locations.push(y);
-    }
-    (vec, locations)
+    println!("{}", count);
 }
