@@ -4,7 +4,7 @@ fn main() {
     let mut input = String::new();
     stdin().read_line(&mut input);
     let mut vec = Vec::with_capacity(2);
-    vec = input.clone().split_whitespace()
+    vec = input.split_whitespace()
         .collect();
 
     input.clear();
@@ -17,7 +17,7 @@ fn main() {
     input.clear();
     stdin().read_line(&mut input);
     let mut target = Vec::with_capacity(1);
-    target = input.clone().split_whitespace()
+    target = input.split_whitespace()
         .collect();
     
     if target[0] == vec[0] {
